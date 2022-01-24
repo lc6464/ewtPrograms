@@ -59,22 +59,22 @@
 			location.href = "about:blank";
 			window.close(); // 经测试，在 Microsoft Edge 88 下，会打开空页，虽然不会被关闭，但可以减少资源占用
 		}
-    	async function getVideoTime() {
-    		try {
-    			const response = await fetch('/customerApi/api/studyprod/lessonCenter/getUserTimeRanking', {
-    				credentials: 'same-origin' // 发送验证信息 (cookies)
-    			});
-    			if (response.ok) { // 判断是否出现 HTTP 异常
-    				return await response.json(); // 如果正常，则获取 JSON 数据
+    		async function getVideoTime() {
+    			try {
+    				const response = await fetch('/customerApi/api/studyprod/lessonCenter/getUserTimeRanking', {
+    					credentials: 'same-origin' // 发送验证信息 (cookies)
+    				});
+    				if (response.ok) { // 判断是否出现 HTTP 异常
+    					return await response.json(); // 如果正常，则获取 JSON 数据
+    				}
+    				else { // 若不正常，返回异常信息
+    					return { success: false, msg: `服务器返回异常 HTTP 状态码：HTTP ${response.status} ${response.statusText}.` };
+    				}
     			}
-    			else { // 若不正常，返回异常信息
-    				return { success: false, msg: `服务器返回异常 HTTP 状态码：HTTP ${response.status} ${response.statusText}.` };
+    			catch (reason) { // 若与服务器连接异常，返回异常信息
+    				return { success: false, msg: '连接服务器过程中出现异常，消息：' + reason.message };
     			}
     		}
-    		catch (reason) { // 若与服务器连接异常，返回异常信息
-    			return { success: false, msg: '连接服务器过程中出现异常，消息：' + reason.message };
-    		}
-    	}
 		{
 			const div = document.createElement('div'), // 创建最外层 <div>
 			style = document.createElement('style'), // 创建 <style>
