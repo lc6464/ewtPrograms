@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name		升学 E 网通广告跳过
 // @namespace	https://lcwebsite.cn/
-// @version		1.2.10-beta.5
+// @version		1.3.0-alpha
 // @description	升学 E 网通广告跳过及视频极速播放。
 // @author		LC
 // @match		http*://web.ewt360.com/site-study/*
@@ -34,13 +34,14 @@
 * 1.2.10-beta.3：无感刷新时按钮样式出现的 bug 修复，延长无感刷新间隔。
 * 1.2.10-beta.4：样式修复，刷新页面内容修改。
 * 1.2.10-beta.5：防冲突修改，降低无感刷新看课时长频率，进一步完善注释。
+* 1.3.0-alpha：E网通改版适配，并进行了一些优化。
 */
 
 (function ($, styleText) {
 	'use strict';
 	if (location.protocol !== 'https:') { // HTTP 转 HTTPS
 		location.protocol = 'https:';
-	} else if (location.hash.substr(1, 10) === "/playVideo") { // 判断是否是播放视频页面
+	} else if (location.hash.substring(1, 16) === "/otherVideoPlay") { // 判断是否是播放视频页面
 		const intervals = { // setInterval 的 ID
 			removeAD: 0,
 			fastPlay: 0,
@@ -56,15 +57,9 @@
 		}
 		async function getVideoTime() { // 获取周看课时长
 			try {
-				const response = await fetch('/customerApi/api/studyprod/lessonCenter/getUserTimeRanking', { // fetch 看课时长 API
-					credentials: 'same-origin' // 发送验证信息 (cookies)
-				});
-				if (response.ok) { // 判断是否出现 HTTP 异常
-					return await response.json(); // 如果正常，则获取 JSON 数据
-				} else { // 若不正常，返回异常信息
-					return { success: false, msg: `服务器返回异常 HTTP 状态码：HTTP ${response.status} ${response.statusText}.` };
-				}
-			} catch (reason) { // 若与服务器连接异常，返回异常信息
+				const response = await fetch('/customerApi/api/studyprod/lessonCenter/getUserTimeRanking', { credentials: 'same-origin' }); // fetch 看课时长 API，发送验证信息 (cookies)
+				return response.ok ? await response.json() : { success: false, msg: `服务器返回异常 HTTP 状态码：HTTP ${response.status} ${response.statusText}.` }; // 判断是否出现 HTTP 异常，若出现，则返回异常信息，否则获取 JSON 数据
+			} catch (reason: any) { // 若与服务器连接异常，返回异常信息
 				return { success: false, msg: '连接服务器过程中出现异常，消息：' + reason.message };
 			}
 		}
@@ -195,7 +190,7 @@
 			}
 			document.body.appendChild(div); // 将 <div> 加入 body
 		}
-		addEventListener('load', function () { // 页面加载完成后执行的代码
+		addEventListener('load', function () { // 页面加载完成后延迟 5s 执行的代码
 			setTimeout(() => { // 0.7s 后检测是否有错误提示，如果有则关闭标签页
 				if ($('.ant-message-custom-content.ant-message-error') !== null) {
 					closeThisPage();
@@ -219,29 +214,30 @@
 					const video: HTMLVideoElement | null = $('video[id^="cc_"][src^="blob:https://"]'); // 获取学习视频 <video>
 					if (video !== null) { // 若 <video> 存在
 						video.volume = 0; // 将视频静音
-						video.addEventListener('play', function () { // 视频开始播放事件
-							setTimeout(() => video.playbackRate = 16, 500); // 0.5s 后将视频 16 倍速播放
-							intervals.fastPlay_2 = setInterval(function () { // 每 1s 检测视频播放速率是否为 16 倍
+						video.addEventListener('playing', function () { // 视频开始播放事件
+							setTimeout(() => video.playbackRate = 16, 800); // 0.8s 后将视频 16 倍速播放
+							intervals.fastPlay_2 = setInterval(function () { // 每 5s 检测视频播放速率是否为 16 倍
 								if (video.playbackRate != 16) { // 若不是则设置
 									video.playbackRate = 16;
 								} else { // 若是则停止循环检测视频播放速率
 									clearInterval(intervals.fastPlay_2);
 									intervals.fastPlay_2 = 0;
 								}
-							}, 1000);
+							}, 5000);
 						});
-						video.addEventListener('pause', function () {
-							const item: HTMLLIElement | null = $('.course_point_question_item'), // 获取选项和确定按钮
-								button: HTMLButtonElement | null = $('.ant-btn.ant-btn-primary.ant-btn-block');
-							if (item !== null) { // 检测暂停回答问题弹窗是否存在
-								item.click(); // 若存在则点击答题结束并确定
-								if (button !== null) {
-									setTimeout(() => button.click(), 10);
+						video.addEventListener('pause', function () { // 若视频暂停，延迟 0.4s 处理
+							setTimeout(function () {
+								const item: HTMLLIElement | null = $('.course_point_question_item'), // 获取选项和确定按钮
+									button: HTMLButtonElement | null = $('.ant-btn.ant-btn-primary.ant-btn-block');
+								if (item !== null) { // 检测暂停回答问题弹窗是否存在
+									item.click(); // 若存在则点击答题结束并确定
+									if (button !== null) { // 我也忘记这个按钮是什么了
+										setTimeout(button.click.bind(button), 50);
+									}
 								}
-
-							}
-							setTimeout(video.play.bind(video), 250);
-						}); // 视频暂停后 250ms 继续播放
+								setTimeout(video.play.bind(video), 400); // 0.4s 后继续播放
+							}, 400);
+						});
 						video.addEventListener('ended', function () { // 视频结束事件
 							if (!loopVideoInput.checked) { // 若关闭刷视频模式才关闭页面
 								closeThisPage();
@@ -255,13 +251,13 @@
 					if ($('.ccH5hdul li') !== null) { // 若清晰度选项卡存在
 						const selected: HTMLLIElement | null = $('.ccH5hdul li.selected'); // 获取已选择选项
 						if (selected !== null) { // 若已选择选项存在
-							if (selected.innerText !== '清晰') { // 若清晰度不为清晰
+							if (selected.innerText !== '标清') { // 若清晰度不为标清
 								const button: HTMLLIElement | null = $('.ccH5hdul li:last-of-type');
 								if (button !== null) {
-									button.click(); // 将清晰度设为清晰
+									button.click(); // 将清晰度设为标清
 								}
-							} else if (selected.innerText === '清晰') {
-								clearInterval(intervals.quality); // 若清晰度为清晰则停止循环
+							} else if (selected.innerText === '标清') {
+								clearInterval(intervals.quality); // 若清晰度为标清则停止循环
 								intervals.quality = 0;
 							}
 						}
@@ -272,7 +268,7 @@
 						location.reload();
 					}
 				}, 2500);
-			}, 4000);
+			}, 5000);
 		});
 	}
 })(document.querySelector.bind(document), `\

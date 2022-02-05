@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name		升学 E 网通广告跳过
 // @namespace	https://lcwebsite.cn/
-// @version		1.2.10-beta.5
+// @version		1.3.0-alpha
 // @description	升学 E 网通广告跳过及视频极速播放。
 // @author		LC
 // @match		http*://web.ewt360.com/site-study/*
@@ -34,6 +34,7 @@
 * 1.2.10-beta.3：无感刷新时按钮样式出现的 bug 修复，延长无感刷新间隔。
 * 1.2.10-beta.4：样式修复，刷新页面内容修改。
 * 1.2.10-beta.5：防冲突修改，降低无感刷新看课时长频率，进一步完善注释。
+* 1.3.0-alpha：E网通改版适配，并进行了一些优化。
 */
 
 (function ($, styleText) {
@@ -41,7 +42,7 @@
 	if (location.protocol !== 'https:') { // HTTP 转 HTTPS
 		location.protocol = 'https:';
 	}
-	else if (location.hash.substr(1, 10) === "/playVideo") { // 判断是否是播放视频页面
+	else if (location.hash.substring(1, 16) === "/otherVideoPlay") { // 判断是否是播放视频页面
 		const intervals = {
 			removeAD: 0,
 			fastPlay: 0,
@@ -61,15 +62,8 @@
 		}
 		async function getVideoTime() {
 			try {
-				const response = await fetch('/customerApi/api/studyprod/lessonCenter/getUserTimeRanking', {
-					credentials: 'same-origin' // 发送验证信息 (cookies)
-				});
-				if (response.ok) { // 判断是否出现 HTTP 异常
-					return await response.json(); // 如果正常，则获取 JSON 数据
-				}
-				else { // 若不正常，返回异常信息
-					return { success: false, msg: `服务器返回异常 HTTP 状态码：HTTP ${response.status} ${response.statusText}.` };
-				}
+				const response = await fetch('/customerApi/api/studyprod/lessonCenter/getUserTimeRanking', { credentials: 'same-origin' }); // fetch 看课时长 API，发送验证信息 (cookies)
+				return response.ok ? await response.json() : { success: false, msg: `服务器返回异常 HTTP 状态码：HTTP ${response.status} ${response.statusText}.` }; // 判断是否出现 HTTP 异常，若出现，则返回异常信息，否则获取 JSON 数据
 			}
 			catch (reason) { // 若与服务器连接异常，返回异常信息
 				return { success: false, msg: '连接服务器过程中出现异常，消息：' + reason.message };
@@ -77,8 +71,8 @@
 		}
 		{
 			const div = document.createElement('div'), // 创建最外层 <div>
-			style = document.createElement('style'), // 创建 <style>
-			h2 = document.createElement('h2'); // 创建 <h2> 标题
+				style = document.createElement('style'), // 创建 <style>
+				h2 = document.createElement('h2'); // 创建 <h2> 标题
 			div.id = 'LC_Tampermonkery_quickVideoPlayback_Settings'; // 指定 <div> 的 ID
 			h2.style.marginBottom = '1.8rem'; // 设定标题的内容和样式
 			h2.style.fontSize = '2.8rem';
@@ -96,7 +90,7 @@
 			}
 			{ // 创建并添加刷视频模式配置开关
 				const label = document.createElement('label'), // 创建外层 <label>
-				input = loopVideoInput; // 获取刷视频开关 <input>
+					input = loopVideoInput; // 获取刷视频开关 <input>
 				label.innerText = '刷视频模式：'; // 设置 <label> 的内容、ID、title 以及 <input> 的 type、hidden、ID
 				label.id = 'LC_Tampermonkery_quickVideoPlayback_loopVideoLabel';
 				label.title = '右键查看刷视频模式的详情';
@@ -129,7 +123,7 @@
 			document.head.appendChild(style); // 将 <style> 加入 head
 			{ // 增加获取周看课时长显示 <div>
 				const timeDiv = document.createElement('div'), // 创建三个元素
-				span = document.createElement('span'), button = document.createElement('button');
+					span = document.createElement('span'), button = document.createElement('button');
 				timeDiv.innerText = '周看课时长：'; // 设置 <div> 内容
 				timeDiv.style.marginTop = '0.8rem'; // 设置 <div> 样式
 				span.innerText = '加载中';
@@ -169,7 +163,7 @@
 				setInterval(noSenseRefreshTime, 30000); // 注册无感刷新时长事件循环
 				{ // 创建并添加显示/隐藏控制面板按钮
 					const buttonIn = document.createElement('button'), // 创建 <button>
-					style = buttonIn.style; // 获取样式
+						style = buttonIn.style; // 获取样式
 					buttonIn.dataset.showed = 'false';
 					buttonIn.innerHTML = '展示控制面板';
 					buttonIn.addEventListener('click', function () {
@@ -226,8 +220,8 @@
 					const video = $('video[id^="cc_"][src^="blob:https://"]'); // 获取学习视频 <video>
 					if (video !== null) { // 若 <video> 存在
 						video.volume = 0; // 将视频静音
-						video.addEventListener('play', function () {
-							setTimeout(() => video.playbackRate = 16, 500); // 0.5s 后将视频 16 倍速播放
+						video.addEventListener('playing', function () {
+							setTimeout(() => video.playbackRate = 16, 800); // 0.8s 后将视频 16 倍速播放
 							intervals.fastPlay_2 = setInterval(function () {
 								if (video.playbackRate != 16) { // 若不是则设置
 									video.playbackRate = 16;
@@ -236,19 +230,21 @@
 									clearInterval(intervals.fastPlay_2);
 									intervals.fastPlay_2 = 0;
 								}
-							}, 1000);
+							}, 5000);
 						});
 						video.addEventListener('pause', function () {
-							const item = $('.course_point_question_item'), // 获取选项和确定按钮
-							button = $('.ant-btn.ant-btn-primary.ant-btn-block');
-							if (item !== null) { // 检测暂停回答问题弹窗是否存在
-								item.click(); // 若存在则点击答题结束并确定
-								if (button !== null) {
-									setTimeout(() => button.click(), 10);
+							setTimeout(function () {
+								const item = $('.course_point_question_item'), // 获取选项和确定按钮
+									button = $('.ant-btn.ant-btn-primary.ant-btn-block');
+								if (item !== null) { // 检测暂停回答问题弹窗是否存在
+									item.click(); // 若存在则点击答题结束并确定
+									if (button !== null) { // 我也忘记这个按钮是什么了
+										setTimeout(button.click.bind(button), 50);
+									}
 								}
-							}
-							setTimeout(video.play.bind(video), 250);
-						}); // 视频暂停后 250ms 继续播放
+								setTimeout(video.play.bind(video), 400); // 0.4s 后继续播放
+							}, 400);
+						});
 						video.addEventListener('ended', function () {
 							if (!loopVideoInput.checked) { // 若关闭刷视频模式才关闭页面
 								closeThisPage();
@@ -262,14 +258,14 @@
 					if ($('.ccH5hdul li') !== null) { // 若清晰度选项卡存在
 						const selected = $('.ccH5hdul li.selected'); // 获取已选择选项
 						if (selected !== null) { // 若已选择选项存在
-							if (selected.innerText !== '清晰') { // 若清晰度不为清晰
+							if (selected.innerText !== '标清') { // 若清晰度不为标清
 								const button = $('.ccH5hdul li:last-of-type');
 								if (button !== null) {
-									button.click(); // 将清晰度设为清晰
+									button.click(); // 将清晰度设为标清
 								}
 							}
-							else if (selected.innerText === '清晰') {
-								clearInterval(intervals.quality); // 若清晰度为清晰则停止循环
+							else if (selected.innerText === '标清') {
+								clearInterval(intervals.quality); // 若清晰度为标清则停止循环
 								intervals.quality = 0;
 							}
 						}
@@ -280,7 +276,7 @@
 						location.reload();
 					}
 				}, 2500);
-			}, 4000);
+			}, 5000);
 		});
 	}
 })(document.querySelector.bind(document), `\
