@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name		升学 E 网通广告跳过
 // @namespace	https://lcwebsite.cn/
-// @version		1.3.0-alpha
+// @version		1.3.0-alpha.2
 // @description	升学 E 网通广告跳过及视频极速播放。
 // @author		LC
 // @match		http*://web.ewt360.com/site-study/*
@@ -35,13 +35,14 @@
 * 1.2.10-beta.4：样式修复，刷新页面内容修改。
 * 1.2.10-beta.5：防冲突修改，降低无感刷新看课时长频率，进一步完善注释。
 * 1.3.0-alpha：E网通改版适配，并进行了一些优化。
+* 1.3.0-alpha.2：修复了首页打开的视频无法使用的问题。
 */
 
 (function ($, styleText) {
 	'use strict';
 	if (location.protocol !== 'https:') { // HTTP 转 HTTPS
 		location.protocol = 'https:';
-	} else if (location.hash.substring(1, 16) === "/otherVideoPlay") { // 判断是否是播放视频页面
+	} else if (location.hash.substring(1, 16) === "/otherVideoPlay" || location.hash.substring(1, 11) == "/playVideo") { // 判断是否是播放视频页面
 		const intervals = { // setInterval 的 ID
 			removeAD: 0,
 			fastPlay: 0,
