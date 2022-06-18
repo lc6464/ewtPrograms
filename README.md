@@ -10,13 +10,13 @@ Bug 修复暂时仍受支持。<br/>
 [【升学E网通】升学E网通相关程序，具有各种不同的功能~ \[哔哩哔哩\]](https://www.bilibili.com/video/BV1dA41157Bz "【升学E网通】升学E网通相关程序，具有各种不同的功能~ [哔哩哔哩]")
 
 ### 使用说明
-- `CSharp/`
+- `CSharp/` （暂停维护，应该可用）
   - `.cs` 文件均为 C# 源代码文件
   - `.exe` 文件均为编译后的可执行二进制文件，请在 `Windows 10 x64` 环境下使用 `PowerShell` 或者 `cmd` 运行。
     - Windows 10 自带运行环境。
     - Windows x86 未测试。
     - Linux 可尝试 `mono` ，但不一定成功（未测试）。
-- `Python/`
+- `Python/` （暂停维护，应该可用）
   - 装了 Python 的人应该都会用吧？
   - 编写说明看下面吧。
 - `TypeScriptAndJavaScript/`
@@ -26,11 +26,11 @@ Bug 修复暂时仍受支持。<br/>
   - 油猴扩展程序 `Tampermonkey` 安装：
     - `Microsoft Edge`
       - 适用于 `Chromium` 的介绍页：[从 Microsoft Edge 加载项网站获取](https://microsoftedge.microsoft.com/addons/detail/tampermonkey/iikmkjmpaadaobahmlepeloendndfphd "扩展介绍页")
-      - 适用于 `Legacy` 的介绍页：[从 Microsoft Store 获取](https://www.microsoft.com/zh-cn/p/tampermonkey/9nblggh5162s "扩展介绍页")
+      - 适用于 `Legacy` 的介绍页（不再建议使用 Microsoft Edge Legacy，建议早日更新至 Microsoft Edge (Chromium)）：[从 Microsoft Store 获取](https://www.microsoft.com/zh-cn/p/tampermonkey/9nblggh5162s "扩展介绍页")
     - `Google Chrome`: [Chrome 网上应用店](https://chrome.google.com/webstore/category/extensions "官方网站")，需要翻墙，请自行搜索。
     - 适用于 `Firefox` 的介绍页: [从 Firefox 附加组件网站获取](https://addons.mozilla.org/zh-CN/firefox/addon/tampermonkey/ "扩展介绍页")
     - 其他浏览器请自行上网查询。
-  - `NodeJS/` 文件夹下的 `.js` 文件请通过 NodeJS 运行，你可能需要先看一下 require 了什么。
+  - `NodeJS/` 文件夹下的 `.js` 文件请通过 NodeJS 运行，你可能需要先看一下 require 了什么。 （暂停维护，应该可用）
 
 ### 如何贡献
 - 如果您有好的想法，您可以通过 `Issue` 向我提出。
