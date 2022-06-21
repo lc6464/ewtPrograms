@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32602.215
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EwtKeepLogin", "EwtKeepLogin.csproj", "{6C56AE11-A64A-4CC7-AF7E-BD48EE1E3E77}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6C56AE11-A64A-4CC7-AF7E-BD48EE1E3E77}.Debug|x64.ActiveCfg = Debug|x64
+		{6C56AE11-A64A-4CC7-AF7E-BD48EE1E3E77}.Debug|x64.Build.0 = Debug|x64
+		{6C56AE11-A64A-4CC7-AF7E-BD48EE1E3E77}.Release|x64.ActiveCfg = Release|x64
+		{6C56AE11-A64A-4CC7-AF7E-BD48EE1E3E77}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {48FF157D-0F7F-4559-9C2D-D4FF7ADC8A5D}
+	EndGlobalSection
+EndGlobal

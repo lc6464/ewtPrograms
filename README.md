@@ -11,10 +11,8 @@ Bug 修复暂时仍受支持。<br/>
 
 ### 使用说明
 - `CSharp/` （暂停维护，应该可用）
-  - `.cs` 文件均为 C# 源代码文件
-  - `.exe` 文件均为编译后的可执行二进制文件，请在 `Windows 10 x64` 环境下使用 `PowerShell` 或者 `cmd` 运行。
-    - Windows 10 自带运行环境。
-    - Windows x86 未测试。
+  - `.exe` 文件为编译后的可执行二进制文件，请在 `Windows 10 x64` 环境下使用 `PowerShell` 或者 `cmd` 运行。
+    - Windows 10 1903 及更高版本自带运行环境。
     - Linux 可尝试 `mono` ，但不一定成功（未测试）。
 - `Python/` （暂停维护，应该可用）
   - 装了 Python 的人应该都会用吧？
@@ -45,7 +43,7 @@ Bug 修复暂时仍受支持。<br/>
   - 使用 `Python 3.9.0` 验证通过。
   - 理论上来说支持 `Python 3.6` 及更高版本，Python 3 应该都没问题，但建议使用较新版本。
 - [CSharp](https://dotnet.microsoft.com ".NET 官网")
-  - 基于 .NET Framework 4.0 （Windows 8, 8.1, 10, 11 均可直接运行）。
-  - 使用 `Visual Studio` 包含的编译器 `csc.exe` 编译。
+  - 基于 .NET Framework 4.8（Windows 10 1903 或更高版本以及 Windows 11 均可直接运行）。
+  - 使用 `Visual Studio 2022` 开发及编译。
 - 制作者：[LC](https://lcwebsite.cn/ "LC网站")
 - 声明：本储存库内所有文本文件中均不包含任何恶意代码，可执行二进制文件均由文本文件使用可信的编译器编译而来，可放心使用！若您发现真的有第三方提交的恶意代码的存在，恳请您通过 Issue 或者在[我的网站](https://lcwebsite.cn "LC网站")中查找联系方式报告！
